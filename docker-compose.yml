@@ -1,0 +1,55 @@
+# ShikshaSetu local stack.
+# The product database is a HOSTED Supabase PostgreSQL project (set DATABASE_URL in .env).
+# `db` / `testdb` are plain PostgreSQL 16 containers used ONLY as a local development / test stand-in
+# (profile `localdb`); they are not the system of record.
+name: shikshasetu
+
+x-backend: &backend
+  build: { context: ./backend }
+  env_file: .env
+  volumes: [ "appdata:/app/data" ]
+  profiles: [ app ]
+
+services:
+  db:
+    image: postgres:16-alpine
+    profiles: [ localdb ]
+    environment: { POSTGRES_PASSWORD: postgres }
+    ports: [ "54322:5432" ]
+    volumes: [ "pgdata:/var/lib/postgresql/data" ]
+    healthcheck: { test: [ "CMD-SHELL", "pg_isready -U postgres" ], interval: 3s, timeout: 3s, retries: 20 }
+  testdb:
+    image: postgres:16-alpine
+    profiles: [ localdb ]
+    environment: { POSTGRES_PASSWORD: postgres }
+    ports: [ "54323:5432" ]
+    tmpfs: [ "/var/lib/postgresql/data" ]
+    healthcheck: { test: [ "CMD-SHELL", "pg_isready -U postgres" ], interval: 3s, timeout: 3s, retries: 20 }
+
+  mock:
+    <<: *backend
+    command: uvicorn mock_services.main:app --host 0.0.0.0 --port 8002
+    ports: [ "8002:8002" ]
+  api:
+    <<: *backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    environment: { MOCK_SERVICES_URL: "http://mock:8002" }
+    ports: [ "8000:8000" ]
+    depends_on: [ mock ]
+  verify:
+    <<: *backend
+    command: uvicorn verify_api.main:app --host 0.0.0.0 --port 8001
+    environment: { MOCK_SERVICES_URL: "http://mock:8002" }
+    ports: [ "8001:8001" ]
+  worker:
+    <<: *backend
+    command: python -m app.cli worker
+    environment: { MOCK_SERVICES_URL: "http://mock:8002" }
+    depends_on: [ mock ]
+  web:
+    build: { context: ./web, args: { VITE_API_URL: "http://localhost:8000/api/v1", VITE_VERIFY_URL: "http://localhost:8001" } }
+    profiles: [ app ]
+    ports: [ "5173:80" ]
+    depends_on: [ api, verify ]
+
+volumes: { pgdata: {}, appdata: {} }

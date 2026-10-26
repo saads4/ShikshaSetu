@@ -1,0 +1,34 @@
+[project]
+name = "shikshasetu-backend"
+version = "0.1.0"
+description = "APAAR ShikshaSetu (PRD: APAAR Sentinel) - core API, mock services, worker"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.8",
+  "sqlalchemy>=2.0",
+  "psycopg[binary]>=3.2",
+  "alembic>=1.13",
+  "httpx>=0.27",
+  "PyJWT>=2.9",
+  "argon2-cffi>=23.1",
+  "cryptography>=43",
+  "pandas>=2.2",
+  "scikit-learn>=1.5",
+  "rapidfuzz>=3.9",
+  "networkx>=3.3",
+  "XlsxWriter>=3.2",
+  "reportlab>=4.2",
+  "segno>=1.6",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.23"]
+
+[tool.setuptools.packages.find]
+include = ["app*", "mock_services*", "verify_api*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

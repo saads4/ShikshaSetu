@@ -1,0 +1,25 @@
+Metadata-Version: 2.4
+Name: shikshasetu-backend
+Version: 0.1.0
+Summary: APAAR ShikshaSetu (PRD: APAAR Sentinel) - core API, mock services, worker
+Requires-Python: >=3.11
+Requires-Dist: fastapi>=0.115
+Requires-Dist: uvicorn[standard]>=0.30
+Requires-Dist: pydantic>=2.8
+Requires-Dist: sqlalchemy>=2.0
+Requires-Dist: psycopg[binary]>=3.2
+Requires-Dist: alembic>=1.13
+Requires-Dist: httpx>=0.27
+Requires-Dist: PyJWT>=2.9
+Requires-Dist: argon2-cffi>=23.1
+Requires-Dist: cryptography>=43
+Requires-Dist: pandas>=2.2
+Requires-Dist: scikit-learn>=1.5
+Requires-Dist: rapidfuzz>=3.9
+Requires-Dist: networkx>=3.3
+Requires-Dist: XlsxWriter>=3.2
+Requires-Dist: reportlab>=4.2
+Requires-Dist: segno>=1.6
+Provides-Extra: dev
+Requires-Dist: pytest>=8; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23; extra == "dev"
